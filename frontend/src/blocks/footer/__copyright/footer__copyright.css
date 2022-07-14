@@ -1,0 +1,11 @@
+.footer__copyright{
+    margin: 0;
+    padding-bottom: 60px;
+}
+
+@media (max-width: 767px) {
+    .footer__copyright {
+        padding-bottom: 35px;
+
+    }
+}
