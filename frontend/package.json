@@ -1,5 +1,5 @@
 {
-  "homepage": "https://f4rr311.github.io/react-mesto-auth/",
+  "homepage": "./",
   "name": "mesto-react",
   "version": "0.1.0",
   "private": true,
@@ -17,7 +17,7 @@
   "scripts": {
     "predeploy": "npm run build",
     "start": "react-scripts start",
-    "build": "react-scripts build  --mode production",
+    "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "deploy": "npm run build && scp -r ./build/* hackmachine@51.250.71.242:/home/hackmachine/react-mesto-api-full/frontend"
