@@ -20,7 +20,7 @@
     "build": "react-scripts build  --mode production",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "deploy": "scp -r ./build/* admin@51.250.5.71:/home/admin/frontend"
+    "deploy": "npm run build && scp -r ./build/* admin@62.84.115.110:/home/admin/react-mesto-api-full/frontend",
   },
   "eslintConfig": {
     "extends": [
