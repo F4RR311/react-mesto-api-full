@@ -14,7 +14,7 @@ export function registerUser(email, password) {
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify(email, password),
+        body: JSON.stringify({email, password}),
 
     }).then(checkResponse);
 }
@@ -26,7 +26,7 @@ export function loginUser(email, password) {
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify(email, password),
+        body: JSON.stringify({email, password}),
 
     }).then(checkResponse);
 }
