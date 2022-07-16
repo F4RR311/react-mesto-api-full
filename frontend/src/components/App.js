@@ -60,21 +60,25 @@ function App() {
             })
     }
 
+    function signOut() {
+        setIsLoggedIn(false);
+        setEmailName(null);
+        navigate("/sign-in");
+        localStorage.removeItem("jwt");
+    }
 
-    useEffect(() => {
-        const jwt = localStorage.getItem("jwt");
+    function handleTokenCheck() {
+        const jwt = localStorage.getItem('jwt');
         if (jwt) {
-            auth.getToken(jwt).then((res) => {
-                if (res) {
+            auth.getToken(jwt)
+                .then((res) => {
                     setIsLoggedIn(true);
-                    setEmailName(res.data.email);
-                }
-            })
-                .catch((err) => {
-                    console.log(err)
+                    navigate('/');
+                    setEmailName(res.email);
                 })
+                .catch((err) => console.log(err));
         }
-    }, [])
+    }
 
     useEffect(() => {
         if (isLoggedIn === true) {
@@ -83,14 +87,18 @@ function App() {
     }, [isLoggedIn, navigate])
 
     useEffect(() => {
-        Promise.all([api.getProfile(), api.getInitialCards()])
-            .then(([user, cards]) => {
-                setCurrentUser(user)
-                setCards(cards)
-            })
-            .catch((err) => {
-            console.error(err);
-        });
+        handleTokenCheck();
+        if (isLoggedIn) {
+            Promise.all([api.getProfile(), api.getInitialCards()])
+                .then(([user, cards]) => {
+                    setCurrentUser(user)
+                    setCards(cards)
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+        }
+
     }, []);
 
     function handleEditAvatarClick() {
@@ -190,12 +198,6 @@ function App() {
         }
     }, [isEditProfilePopupOpen, isAddPlacePopupOpen, isEditAvatarPopupOpen, isAddPlacePopupOpen, selectedCard]);
 
-    function signOut() {
-        setIsLoggedIn(false);
-        setEmailName(null);
-        navigate("/sign-in");
-        localStorage.removeItem("jwt");
-    }
 
     return (
         <CurrentUserContext.Provider value={currentUser}>
