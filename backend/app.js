@@ -40,9 +40,9 @@ app.post('/signup', validUser, createUser);
 app.use('/users', auth, usersRoutes);
 app.use('/cards', auth, cardsRoutes);
 
-app.get('/signout', (req, res) => {
-  res.clearCookie('jwt').send({ message: 'Выход' });
-});
+// app.get('/signout', (req, res) => {
+//   res.clearCookie('jwt').send({ message: 'Выход' });
+// });
 
 app.use('*', auth, () => {
   throw new ErrorNotFound('Запрашиваемая страница не найдена');
