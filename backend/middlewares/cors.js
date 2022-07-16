@@ -1,4 +1,6 @@
 const allowedCors = [
+  'http://domainname.students.nomoredomains.sbs',
+  'http://domainname.students.nomoredomains.sbs',
   'https://api.mymesto.nomoredomains.xyz',
   'http://api.mymesto.nomoredomains.xyz',
   'localhost:3000',
