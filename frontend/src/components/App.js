@@ -80,26 +80,6 @@ function App() {
         }
     }
 
-    useEffect(() => {
-        if (isLoggedIn === true) {
-            navigate('/');
-        }
-    }, [isLoggedIn, navigate])
-
-    useEffect(() => {
-        handleTokenCheck();
-        if (isLoggedIn) {
-            Promise.all([api.getProfile(), api.getInitialCards()])
-                .then(([user, cards]) => {
-                    setCurrentUser(user)
-                    setCards(cards)
-                })
-                .catch((err) => {
-                    console.error(err);
-                });
-        }
-
-    }, []);
 
     function handleEditAvatarClick() {
         setEditAvatarPopupOpen(true);
@@ -198,6 +178,26 @@ function App() {
         }
     }, [isEditProfilePopupOpen, isAddPlacePopupOpen, isEditAvatarPopupOpen, isAddPlacePopupOpen, selectedCard]);
 
+    useEffect(() => {
+        if (isLoggedIn === true) {
+            navigate('/');
+        }
+    }, [isLoggedIn, navigate])
+
+    useEffect(() => {
+        handleTokenCheck();
+        if (isLoggedIn) {
+            Promise.all([api.getProfile(), api.getInitialCards()])
+                .then(([user, cards]) => {
+                    setCurrentUser(user)
+                    setCards(cards)
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+        }
+
+    }, [isLoggedIn]);
 
     return (
         <CurrentUserContext.Provider value={currentUser}>
