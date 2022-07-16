@@ -11,6 +11,7 @@ const { createUser, login } = require('./controllers/users');
 const auth = require('./middlewares/auth');
 const errorHandler = require('./middlewares/errorHandler');
 const ErrorNotFound = require('./errors/ErrorNotFound');
+const cors = require('./middlewares/cors');
 
 // Слушаем 3000 порт
 const { PORT = 3000 } = process.env;
@@ -26,10 +27,15 @@ app.post('/signup', validUser, createUser);
 app.use('/users', auth, usersRoutes);
 app.use('/cards', auth, cardsRoutes);
 
+app.get('/signout', (req, res) => {
+  res.clearCookie('jwt').send({ message: 'Выход' });
+});
+
 app.use('*', auth, () => {
   throw new ErrorNotFound('Запрашиваемая страница не найдена');
 });
 
+app.use(cors);
 mongoose.connect('mongodb://127.0.0.1:27017/mestodb', { useNewUrlParser: true });
 
 app.use(errors());
