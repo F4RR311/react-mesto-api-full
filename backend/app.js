@@ -1,8 +1,8 @@
+require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const { errors } = require('celebrate');
-require('dotenv').config();
 const cookieParser = require('cookie-parser');
 const helmet = require('helmet');
 const { validLogin, validUser } = require('./middlewares/validation');
