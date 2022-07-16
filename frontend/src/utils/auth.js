@@ -7,26 +7,26 @@ function checkResponse(res) {
 
 export const BASE_URL = "https://api.mymesto.nomoredomains.xyz";
 
-export function registerUser(email, password) {
+export function registerUser(password, email) {
     return fetch(`${BASE_URL}/signup`, {
         method: 'POST',
         credentials: 'include',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({email, password}),
+        body: JSON.stringify({password, email})
 
     }).then(checkResponse);
 }
 
-export function loginUser(email, password) {
+export function loginUser(password, email) {
     return fetch(`${BASE_URL}/signin`, {
         method: 'POST',
         credentials: 'include',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({email, password}),
+        body: JSON.stringify({password, email}),
 
     }).then(checkResponse);
 }

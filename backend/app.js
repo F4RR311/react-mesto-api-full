@@ -44,10 +44,9 @@ app.use('/cards', auth, cardsRoutes);
 //   res.clearCookie('jwt').send({ message: 'Выход' });
 // });
 
-app.use('*', auth, () => {
-  throw new ErrorNotFound('Запрашиваемая страница не найдена');
-});
-
+app.use('*', (req, res, next) => next(
+  new NotFoundError('Запрошен не существующий ресурс'),
+));
 
 
 app.use(errors());
