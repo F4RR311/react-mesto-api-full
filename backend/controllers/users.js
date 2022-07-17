@@ -10,7 +10,7 @@ const { NODE_ENV, JWT_SECRET } = process.env;
 
 module.exports.getUser = (req, res, next) => {
   User.find({})
-    .then((users) => res.send({ data: users }))
+    .then((users) => res.send(users))
     .catch(next);
 };
 
@@ -18,27 +18,33 @@ module.exports.getUserMe = (req, res, next) => {
   User.findById(req.user._id)
     .orFail(() => new ErrorNotFound('Запрашиваемый пользователь не найден'))
     .then((user) => {
-      res.status(200).send({ data: user });
+      res.status(200).send(user);
     })
     .catch(next);
 };
 
 module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
-  return User.findUserByCredentials(email, password)
+   User.findUserByCredentials(email, password)
     .then((user) => {
       const token = jwt.sign(
         { _id: user._id },
         NODE_ENV === 'production' ? JWT_SECRET : 'secret-key',
         { expiresIn: '7d' },
       );
-    return   res.cookie('jwt', token, {
+      res.cookie('jwt', token, {
         maxAge: 3600000 * 24 * 7,
         httpOnly: true,
-        SameSite:'none',
+        SameSite:true,
         Secure:true
-      }) .status(200)
-        .send({ message: 'Вход выполнен' });
+      });
+      res.status(200).send({
+        name: user.name,
+        about: user.about,
+        avatar: user.avatar,
+        email: user.email,
+        _id: user._id,
+      });
     })
     .catch(() => {
       next(new Unauthorized('Не правильный логин или пароль'));
