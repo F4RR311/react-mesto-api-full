@@ -6,7 +6,7 @@ const ErrorConflict = require('../errors/ErrorConflict');
 const BadRequestError = require('../errors/BadRequestError');
 const Unauthorized = require('../errors/Unauthorized');
 
-const { NODE_ENV, JWT_SECRET } = process.env;
+//const { NODE_ENV, JWT_SECRET } = process.env;
 
 module.exports.getUser = (req, res, next) => {
   User.find({})
@@ -25,30 +25,27 @@ module.exports.getUserMe = (req, res, next) => {
 
 module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
-   User.findUserByCredentials(email, password)
+
+  User.findOne({ email }).select('+password')
     .then((user) => {
+      if (!user) {
+        return Promise.reject(new Unauthorized('Неправильные почта или пароль'));
+      }
+      return Promise.all([bcrypt.compare(password, user.password), user]);
+    })
+    .then(([isPasswordCorrect, user]) => {
+      if (!isPasswordCorrect) {
+        return Promise.reject(new Unauthorized('Неправильная почта или пароль'));
+      }
+      const { JWT_SECRET = 'secret-key' } = process.env;
       const token = jwt.sign(
         { _id: user._id },
-        NODE_ENV === 'production' ? JWT_SECRET : 'secret-key',
+        JWT_SECRET,
         { expiresIn: '7d' },
       );
-      res.cookie('jwt', token, {
-        maxAge: 3600000 * 24 * 7,
-        httpOnly: true,
-        SameSite:true,
-        Secure:true
-      });
-      res.status(200).send({
-        name: user.name,
-        about: user.about,
-        avatar: user.avatar,
-        email: user.email,
-        _id: user._id,
-      });
+      return res.send({ token, message: 'Все верно!' });
     })
-    .catch(() => {
-      next(new Unauthorized('Не правильный логин или пароль'));
-    });
+    .catch(next);
 };
 
 module.exports.logout = (req, res, next) => {
@@ -100,6 +97,7 @@ module.exports.createUser = (req, res, next) => {
         about: user.about,
         avatar: user.avatar,
         email: user.email,
+        _id: user._id,
       },
     }))
     .catch((err) => {

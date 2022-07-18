@@ -12,7 +12,8 @@ export function registerUser(email, password) {
         method: 'POST',
         credentials: 'include',
         headers: {
-            'Content-Type': 'application/json'
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
         },
         body: JSON.stringify({email, password}),
 
@@ -22,30 +23,33 @@ export function registerUser(email, password) {
 export function loginUser(email, password) {
     return fetch(`${BASE_URL}/signin`, {
         method: 'POST',
-      credentials: 'include',
+        credentials: 'include',
         headers: {
-            'Content-Type': 'application/json'
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
         },
         body: JSON.stringify({email, password}),
 
     }).then(checkResponse);
 }
 
-export function getToken(jwt) {
+export function getToken(token) {
     return fetch(`${BASE_URL}/users/me`, {
         method: 'GET',
         credentials: 'include',
         headers: {
-            "Content-Type": "application/json",
-           'Authorization': `Bearer ${jwt}`,
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
         },
     }).then(checkResponse);
 }
+
 export function logout(email) {
     return fetch(`${BASE_URL}/signout`, {
         method: 'POST',
         credentials: 'include',
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email })
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({email})
     })
 }

@@ -16,7 +16,7 @@ import ProtectedRoute from "./ProtectedRoute";
 import InfoTooltip from "./InfoTooltip";
 import resolve from "../images/resolve.svg"
 import reject from "../images/reject.svg"
-import {loginUser, logout, registerUser} from "../utils/auth";
+import {logout} from "../utils/auth";
 
 
 function App() {
@@ -35,6 +35,7 @@ function App() {
     const [infoTooltip, setInfoTooltip] = useState(false);
 
     useEffect(() => {
+        handleTokenCheck();
         if (isLoggedIn) {
             Promise.all([api.getProfile(), api.getInitialCards()])
                 .then(([user, cards]) => {
@@ -48,9 +49,9 @@ function App() {
 
     }, [isLoggedIn]);
 
-    useEffect(() => {
-        handleTokenCheck();
-    }, []);
+    // useEffect(() => {
+    //     handleTokenCheck();
+    // }, []);
 
     useEffect(() => {
         if (isLoggedIn === true) {
@@ -60,11 +61,15 @@ function App() {
 
 
     function onRegister(email, password) {
-        return registerUser(email, password).then(() => {
-            setPopupImage(resolve);
-            setPopupTitle('Вы успешно зарегистрировались');
-            navigate('/sign-in');
-        })
+        auth.registerUser(email, password)
+            .then((res) => {
+                if (res) {
+                    console.log(res)
+                    setPopupImage(resolve);
+                    setPopupTitle('Вы успешно зарегистрировались');
+                    navigate('/sign-in');
+                }
+            })
             .catch(() => {
                 setPopupImage(reject);
                 setPopupTitle("Что-то пошло не так! Попробуйте ещё раз");
@@ -73,14 +78,9 @@ function App() {
     }
 
     function onLogin(email, password) {
-        return loginUser(email, password)
-            .then((res) => {
-                if (res.email) {
-                    localStorage.setItem("email", res.email);
-                    handleTokenCheck();
-                }
-
-                handleTokenCheck();
+        auth.loginUser(email, password)
+            .then(({token}) => {
+                localStorage.setItem("jwt", token);
                 setIsLoggedIn(true);
                 setEmailName(email);
                 navigate('/');
@@ -105,8 +105,9 @@ function App() {
     }
 
     function handleTokenCheck() {
-        if (localStorage.getItem("email")) {
-            auth.getToken()
+        const jwt = localStorage.getItem('jwt');
+        if (jwt) {
+            auth.getToken(jwt)
                 .then((res) => {
                     setIsLoggedIn(true);
                     navigate('/');

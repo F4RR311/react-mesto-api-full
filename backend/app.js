@@ -38,7 +38,7 @@ app.get('/crash-test', () => {
 });
 
 app.post('/signin', validLogin, login);
-app.post('/signout', auth, logout);
+//app.post('/signout', auth, logout);
 app.post('/signup', validUser, createUser);
 app.use('/users', auth, usersRoutes);
 app.use('/cards', auth, cardsRoutes);
@@ -49,6 +49,7 @@ app.use('*', (req, res, next) => next(
   new NotFoundError('Запрошен не существующий ресурс'),
 ));
 
+//app.use(auth);
 
 app.use(errors());
 app.use(errorHandler);
