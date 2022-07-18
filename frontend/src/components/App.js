@@ -81,9 +81,9 @@ function App() {
                 }
 
                 handleTokenCheck();
-                // setIsLoggedIn(true);
-                // setEmailName(email);
-                // navigate('/');
+                setIsLoggedIn(true);
+                setEmailName(email);
+                navigate('/');
             })
             .catch(() => {
                 setPopupImage(reject);
