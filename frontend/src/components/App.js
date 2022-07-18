@@ -95,7 +95,7 @@ function App() {
     function signOut() {
         return logout()
             .then(() => {
-                localStorage.removeItem("email");
+                localStorage.removeItem("jwt");
                 setIsLoggedIn(false);
                 setEmailName(null);
                 navigate("/sign-in");

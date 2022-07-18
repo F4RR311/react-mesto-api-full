@@ -6,8 +6,6 @@ const { errors } = require('celebrate');
 const cookieParser = require('cookie-parser');
 const helmet = require('helmet');
 const { validLogin, validUser } = require('./middlewares/validation');
-const usersRoutes = require('./routes/users');
-const cardsRoutes = require('./routes/cards');
 const { createUser, login } = require('./controllers/users');
 const auth = require('./middlewares/auth');
 const errorHandler = require('./middlewares/errorHandler');
@@ -21,10 +19,8 @@ const app = express();
 
 mongoose.connect('mongodb://127.0.0.1:27017/mestodb', { useNewUrlParser: true });
 
-app.use(cors({
-  credentials: true,
-}));
 
+app.use(cors);
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
@@ -39,11 +35,10 @@ app.get('/crash-test', () => {
 
 app.post('/signin', validLogin, login);
 //app.post('/signout', auth, logout);
-app.post('/signup', validUser, createUser);
-app.use('/users', auth, usersRoutes);
-app.use('/cards', auth, cardsRoutes);
-
-
+app.post('/signup', validUser, createUser)
+app.use(auth);
+app.use('/', require('./routes/users'));
+app.use('/', require('./routes/cards'));
 
 app.use('*', (req, res, next) => next(
   new NotFoundError('Запрошен не существующий ресурс'),
