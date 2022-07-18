@@ -37,7 +37,15 @@ export function getToken(jwt) {
         credentials: 'include',
         headers: {
             "Content-Type": "application/json",
-            'Authorization': `Bearer ${jwt}`,
+           // 'Authorization': `Bearer ${jwt}`,
         },
     }).then(checkResponse);
+}
+export function logout(email) {
+    return fetch(`${baseUrl}/signout`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email })
+    })
 }

@@ -15,7 +15,7 @@ module.exports.getUser = (req, res, next) => {
 };
 
 module.exports.getUserMe = (req, res, next) => {
-  User.findById(req.user._id)
+  User.findById(req.params.userId)
     .orFail(() => new ErrorNotFound('Запрашиваемый пользователь не найден'))
     .then((user) => {
       res.status(200).send(user);
@@ -49,6 +49,19 @@ module.exports.login = (req, res, next) => {
     .catch(() => {
       next(new Unauthorized('Не правильный логин или пароль'));
     });
+};
+
+module.exports.logout = (req, res, next) => {
+  const { email } = req.body;
+  User.findOne({ email })
+    .then(() => {
+      res.clearCookie('jwt', {
+        httpOnly: true,
+        sameSite: true,
+      })
+        .end();
+    })
+    .catch(next);
 };
 
 module.exports.getUserId = (req, res, next) => {
@@ -104,6 +117,7 @@ module.exports.createUser = (req, res, next) => {
 module.exports.updateUserInfo = (req, res, next) => {
   const { name, about } = req.body;
   const userId = req.user._id;
+
   User.findByIdAndUpdate(userId, { name, about }, { new: true, runValidators: true })
     .then((user) => {
       if (!user) {
