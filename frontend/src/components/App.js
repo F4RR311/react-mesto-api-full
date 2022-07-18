@@ -16,7 +16,7 @@ import ProtectedRoute from "./ProtectedRoute";
 import InfoTooltip from "./InfoTooltip";
 import resolve from "../images/resolve.svg"
 import reject from "../images/reject.svg"
-import {logout} from "../utils/auth";
+import {loginUser, logout, registerUser} from "../utils/auth";
 
 
 function App() {
