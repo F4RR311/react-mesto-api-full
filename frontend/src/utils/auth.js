@@ -42,7 +42,7 @@ export function getToken(jwt) {
     }).then(checkResponse);
 }
 export function logout(email) {
-    return fetch(`${baseUrl}/signout`, {
+    return fetch(`${BASE_URL}/signout`, {
         method: 'POST',
         credentials: 'include',
         headers: { "Content-Type": "application/json" },
