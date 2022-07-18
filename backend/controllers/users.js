@@ -54,6 +54,7 @@ module.exports.logout = (req, res, next) => {
     .then(() => {
       res.clearCookie('jwt', {
         httpOnly: true,
+        httpsOnly: true,
         sameSite: true,
       })
         .end();
