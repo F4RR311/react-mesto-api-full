@@ -1,24 +1,3 @@
 .elements {
-    max-width: 880px;
-    margin: 50px auto auto;
-    display: grid;
-    grid-template-columns:repeat(auto-fill, 282px);
-    grid-row-gap: 20px;
-    grid-column-gap: 17px;
-
-
+  max-width: 880px;
 }
-
-@media (max-width: 1023px) {
-    .elements {
-        max-width: 581px;
-    }
-}
-@media (max-width: 767px) {
-    .elements {
-        grid-template-columns:1fr;
-        max-width: 282px;
-        margin: 35px auto auto;
-    }
-}
-

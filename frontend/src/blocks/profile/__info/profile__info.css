@@ -1,19 +1,12 @@
 .profile__info {
-    display: flex;
-    flex-direction: column;
-    flex-wrap: wrap;
-    justify-content: center;
-    padding-left: 30px;
-    padding-right: 30px;
-    box-sizing: border-box;
-    flex-basis: calc(100% - 270px);
-
+  margin-left: 30px;
+  margin-top: 22px;
+  max-width: 400px;
+  padding: 0;
 }
 
-@media (max-width: 767px) {
-    .profile__info {
-
-        max-width: 282px;
-    }
+@media screen and (max-width: 800px) {
+  .profile__info {
+    margin: 0;
+  }
 }
-

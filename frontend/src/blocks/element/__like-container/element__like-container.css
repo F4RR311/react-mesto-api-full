@@ -1,9 +1,0 @@
-.element__like-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-right: 20px;
-    font-weight: 400;
-    font-size: 13px;
-    line-height: 15.7px;
-}

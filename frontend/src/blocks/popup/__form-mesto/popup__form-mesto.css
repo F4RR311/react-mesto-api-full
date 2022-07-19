@@ -1,0 +1,14 @@
+.popup__form-mesto {
+  width: 430px;
+  height: 330px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+@media screen and (max-width: 600px) {
+  .popup__form-mesto {
+    width: 282px;
+    height: 322px;
+  }
+}
