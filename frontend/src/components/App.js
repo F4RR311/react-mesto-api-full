@@ -33,6 +33,28 @@ function App() {
     const [popupTitle, setPopupTitle] = useState('');
     const [infoTooltip, setInfoTooltip] = useState(false);
 
+    useEffect(() => {
+        handleTokenCheck();
+        if (isLoggedIn) {
+            Promise.all([api.getProfile(), api.getInitialCards()])
+                .then(([user, cards]) => {
+                    setCurrentUser(user)
+                    setCards(cards)
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+        }
+
+    }, [isLoggedIn]);
+
+    useEffect(() => {
+        if (isLoggedIn === true) {
+            navigate('/');
+        }
+    }, [isLoggedIn, navigate])
+
+
     function onRegister(email, password) {
         auth.registerUser(email, password).then(() => {
             setPopupImage(resolve);
@@ -79,7 +101,6 @@ function App() {
                 .catch((err) => console.log(err));
         }
     }
-
 
     function handleEditAvatarClick() {
         setEditAvatarPopupOpen(true);
@@ -178,26 +199,8 @@ function App() {
         }
     }, [isEditProfilePopupOpen, isAddPlacePopupOpen, isEditAvatarPopupOpen, isAddPlacePopupOpen, selectedCard]);
 
-    useEffect(() => {
-        if (isLoggedIn === true) {
-            navigate('/');
-        }
-    }, [isLoggedIn, navigate])
 
-    useEffect(() => {
-        handleTokenCheck();
-        if (isLoggedIn) {
-            Promise.all([api.getProfile(), api.getInitialCards()])
-                .then(([user, cards]) => {
-                    setCurrentUser(user)
-                    setCards(cards)
-                })
-                .catch((err) => {
-                    console.error(err);
-                });
-        }
 
-    }, [isLoggedIn]);
 
     return (
         <CurrentUserContext.Provider value={currentUser}>
