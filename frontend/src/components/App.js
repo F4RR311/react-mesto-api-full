@@ -33,39 +33,12 @@ function App() {
     const [popupTitle, setPopupTitle] = useState('');
     const [infoTooltip, setInfoTooltip] = useState(false);
 
-    useEffect(() => {
-        handleTokenCheck();
-        if (isLoggedIn) {
-            Promise.all([api.getProfile(), api.getInitialCards()])
-                .then(([user, cards]) => {
-                    setCurrentUser(user)
-                    setCards(cards)
-                })
-                .catch((err) => {
-                    console.error(err);
-                });
-        }
-
-    }, [isLoggedIn]);
-
-
-    useEffect(() => {
-        if (isLoggedIn === true) {
-            navigate('/');
-        }
-    }, [isLoggedIn, navigate])
-
-
     function onRegister(email, password) {
-        auth.registerUser(email, password)
-            .then((res) => {
-                if (res) {
-                    console.log(res)
-                    setPopupImage(resolve);
-                    setPopupTitle('Вы успешно зарегистрировались');
-                    navigate('/sign-in');
-                }
-            })
+        auth.registerUser(email, password).then(() => {
+            setPopupImage(resolve);
+            setPopupTitle('Вы успешно зарегистрировались');
+            navigate('/sign-in');
+        })
             .catch(() => {
                 setPopupImage(reject);
                 setPopupTitle("Что-то пошло не так! Попробуйте ещё раз");
@@ -87,24 +60,17 @@ function App() {
             })
     }
 
-    useEffect(() => {
-        handleTokenCheck();
-    }, []);
-
-
     function signOut() {
-                localStorage.removeItem("jwt");
-                setIsLoggedIn(false);
-                setEmailName(null);
-                navigate("/sign-in");
-
-
+        setIsLoggedIn(false);
+        setEmailName(null);
+        navigate("/sign-in");
+        localStorage.removeItem("jwt");
     }
 
     function handleTokenCheck() {
-        const token = localStorage.getItem('token');
-        if (token) {
-            auth.getToken(token)
+        const jwt = localStorage.getItem('jwt');
+        if (jwt) {
+            auth.getToken(jwt)
                 .then((res) => {
                     setIsLoggedIn(true);
                     navigate('/');
@@ -212,6 +178,26 @@ function App() {
         }
     }, [isEditProfilePopupOpen, isAddPlacePopupOpen, isEditAvatarPopupOpen, isAddPlacePopupOpen, selectedCard]);
 
+    useEffect(() => {
+        if (isLoggedIn === true) {
+            navigate('/');
+        }
+    }, [isLoggedIn, navigate])
+
+    useEffect(() => {
+        handleTokenCheck();
+        if (isLoggedIn) {
+            Promise.all([api.getProfile(), api.getInitialCards()])
+                .then(([user, cards]) => {
+                    setCurrentUser(user)
+                    setCards(cards)
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+        }
+
+    }, [isLoggedIn]);
 
     return (
         <CurrentUserContext.Provider value={currentUser}>
