@@ -4,6 +4,7 @@ const Unauthorized = require('../errors/Unauthorized');
 const { NODE_ENV, JWT_SECRET } = process.env;
 
 module.exports = (req, res, next) => {
+  console.log('is authorized');
   const token = req.cookies.jwt;
   if (!token) {
     next(new Unauthorized('Ошибка авторизации: Не передан токен'));
@@ -16,6 +17,7 @@ module.exports = (req, res, next) => {
     next(new Unauthorized('Ошибка авторизации'));
     return;
   }
+  console.log(payload);
   req.user = payload;
   next();
 };

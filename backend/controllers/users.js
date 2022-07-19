@@ -8,26 +8,48 @@ const Unauthorized = require('../errors/Unauthorized');
 
 const { NODE_ENV, JWT_SECRET } = process.env;
 
+
 module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
-
-  return User.findUserByCredentials(email, password)
+  User.findOne({ email }).select('+password')
     .then((user) => {
-      const token = jwt.sign(
-        { _id: user._id },
-        NODE_ENV === 'production' ? JWT_SECRET : 'secret-key',
-        { expiresIn: '7d' },
-      );
-      res.cookie('jwt', token, {
-        maxAge: 3600000 * 24 * 7,
-        httpOnly: true,
-      });
-      res
-        .status(200)
-        .send({ token, NODE_ENV, JWT_SECRET });
+      if (!user) {
+        throw new Unauthorized('Неправильные email или пароль (проверка юзера).');
+      }
+      return bcrypt.compare(password, user.password)
+        .then((matched) => {
+          if (!matched) {
+            throw new Unauthorized('Неправильные email или пароль (проверка хеша).');
+          }
+
+          const token = jwt.sign({ _id: user._id }, NODE_ENV === 'production' ? JWT_SECRET : 'secret-key', { expiresIn: '7d' });
+          res.cookie('jwt', token, { maxAge: 3600000 * 24 * 7, httpOnly: true });
+          res.status(200).send({ _id: user._id, email: user.email });
+        })
+        .catch(next);
     })
     .catch(next);
 };
+// module.exports.login = (req, res, next) => {
+//   const { email, password } = req.body;
+//
+//   return User.findUserByCredentials(email, password)
+//     .then((user) => {
+//       const token = jwt.sign(
+//         { _id: user._id },
+//         NODE_ENV === 'production' ? JWT_SECRET : 'secret-key',
+//         { expiresIn: '7d' },
+//       );
+//       res.cookie('jwt', token, {
+//         maxAge: 3600000 * 24 * 7,
+//         httpOnly: true,
+//       });
+//       res
+//         .status(200)
+//         .send({ token, NODE_ENV, JWT_SECRET });
+//     })
+//     .catch(next);
+// };
 
 // module.exports.login = (req, res, next) => {
 //   const { email, password } = req.body;

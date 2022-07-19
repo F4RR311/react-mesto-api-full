@@ -29,9 +29,11 @@ function App() {
     const [cards, setCards] = useState([]);
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [emailName, setEmailName] = useState(null);
+
     const [popupImage, setPopupImage] = useState('');
     const [popupTitle, setPopupTitle] = useState('');
     const [infoTooltip, setInfoTooltip] = useState(false);
+    const [userData, setUserData] = useState({_id: "", email: ""});
 
     useEffect(() => {
 
@@ -51,14 +53,12 @@ function App() {
 
     /* Вход */
     function onLogin(email, password) {
-        auth.loginUser(email, password)
-            .then((res) => {
-                localStorage.setItem('jwt', res.token);
-                handleTokenCheck();
-                setIsLoggedIn(true);
-                setEmailName(res.email);
-                navigate('/');
-            })
+        auth.loginUser(email, password).then((res) => {
+            localStorage.setItem("jwt", res.token);
+            setIsLoggedIn(true);
+            setEmailName(email);
+            navigate('/');
+        })
             .catch(() => {
                 setPopupImage(reject);
                 setPopupTitle('Что-то пошло не так! Попробуйте ещё раз');
@@ -77,12 +77,11 @@ function App() {
     }, []);
 
     function onRegister(email, password) {
-        auth.registerUser(email, password)
-            .then((res) => {
-                setPopupImage(resolve);
-                setPopupTitle('Вы успешно зарегистрировались');
-                navigate('/sign-in');
-            })
+        auth.registerUser(email, password).then(() => {
+            setPopupImage(resolve);
+            setPopupTitle('Вы успешно зарегистрировались');
+            navigate('/sign-in');
+        })
             .catch(() => {
                 setPopupImage(reject);
                 setPopupTitle("Что-то пошло не так! Попробуйте ещё раз");
