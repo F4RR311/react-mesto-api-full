@@ -1,5 +1,6 @@
 require('dotenv').config();
 const express = require('express');
+const app = express();
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const { errors } = require('celebrate');
@@ -12,17 +13,27 @@ const { createUser, login } = require('./controllers/users');
 const auth = require('./middlewares/auth');
 const errorHandler = require('./middlewares/errorHandler');
 const ErrorNotFound = require('./errors/ErrorNotFound');
-const cors = require('./middlewares/cors');
+//const cors = require('./middlewares/cors');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
-
+const cors = require('cors');
 // Слушаем 3000 порт
 const { PORT = 3001 } = process.env;
-const app = express();
 
+
+
+const allowedCors = {
+  origin: [
+    'http://localhost:3001',
+    'http://domainname.students.nomoredomains.sbs',
+    'http://domainname.students.nomoredomains.sbs',
+  ],
+  credentials: true,
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+};
 mongoose.connect('mongodb://127.0.0.1:27017/mestodb', { useNewUrlParser: true });
 
-app.use(cors);
 
+app.use(cors(allowedCors));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
