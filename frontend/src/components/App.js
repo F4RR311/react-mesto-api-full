@@ -35,7 +35,7 @@ function App() {
     const [infoTooltip, setInfoTooltip] = useState(false);
 
     useEffect(() => {
-        handleTokenCheck();
+    //    handleTokenCheck();
         if (isLoggedIn) {
             Promise.all([api.getProfile(), api.getInitialCards()])
                 .then(([user, cards]) => {
@@ -49,9 +49,6 @@ function App() {
 
     }, [isLoggedIn]);
 
-    // useEffect(() => {
-    //     handleTokenCheck();
-    // }, []);
 
     useEffect(() => {
         if (isLoggedIn === true) {
@@ -90,9 +87,14 @@ function App() {
                 setPopupTitle('Что-то пошло не так! Попробуйте ещё раз');
                 handleInfoTooltip();
             })
-    }
 
-    function signOut() {
+    }
+        useEffect(() => {
+            handleTokenCheck();
+        }, []);
+
+
+        function signOut() {
         return logout()
             .then(() => {
                 localStorage.removeItem("jwt");

@@ -1,34 +1,33 @@
-const cors = require('cors');
+ const allowedCors = [
+  'localhost:3000',
+  'http://localhost:3000',
+  //
+  // 'localhost:3001',
+  // 'http://localhost:3001',
+  // 'https://localhost:3001',
+  'domainname.students.nomoredomains.sbs',
+  'http://domainname.students.nomoredomains.sbs',
+  'https://domainname.students.nomoredomains.sbs',
+  // 'https://api.mymesto.nomoredomains.xyz',
+  // 'http://api.mymesto.nomoredomains.xyz',
+];
 
-const listUrl = () => {
-  const { NODE_ENV } = process.env;
-  let list = [];
-  if (NODE_ENV) {
-    list = [
+module.exports = ((req, res, next) => {
+  const { origin } = req.headers;
+  const { method } = req;
+  const DEFAULT_ALLOWED_METHODS = 'GET,HEAD,PUT,PATCH,POST,DELETE';
+  const requestHeaders = req.headers['access-control-request-headers'];
 
-      'http://localhost:3001',
-      'https://localhost:3001',
-      'domainname.students.nomoredomains.sbs',
-      'http://domainname.students.nomoredomains.sbs',
-      'https://domainname.students.nomoredomains.sbs',
-      'https://api.mymesto.nomoredomains.xyz',
-      'http://api.mymesto.nomoredomains.xyz',
-    ];
-  } else {
-    list = [
-      'localhost:3000',
-      'http://localhost:3000',
-      'https://localhost:3000',
-      'localhost:3001',
-    ];
+  if (allowedCors.includes(origin)) {
+    res.header('Access-Control-Allow-Origin', origin);
+    res.header('Access-Control-Allow-Credentials', true);
   }
-  return list;
-};
+  if (method === 'OPTIONS') {
+    res.header('Access-Control-Allow-Methods', DEFAULT_ALLOWED_METHODS);
+    res.header('Access-Control-Allow-Headers', requestHeaders);
+    res.end();
+    return;
+  }
 
-const allowedCors = {
-  origin: listUrl(),
-  credentials: true,
-  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-};
-
-module.exports = cors(allowedCors);
+  next();
+});

@@ -36,13 +36,19 @@ export function loginUser(email, password) {
 export function getToken(token) {
     return fetch(`${BASE_URL}/users/me`, {
         method: 'GET',
-        credentials: 'include',
-        headers: {
+              headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
+          //  'Authorization': `Bearer ${token}`,
         },
-    }).then(checkResponse);
+        credentials: 'include',
+    }).then((res) => {
+        if (res.status === 400) {
+            throw new Error("Токен не передан или передан не в том формате");
+        } else if (res.status === 401) {
+            throw new Error("Переданный токен некорректен");
+        } else return res.json();
+    });
 }
 
 export function logout(email) {
