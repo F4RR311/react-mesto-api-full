@@ -16,7 +16,6 @@ import ProtectedRoute from "./ProtectedRoute";
 import InfoTooltip from "./InfoTooltip";
 import resolve from "../images/resolve.svg"
 import reject from "../images/reject.svg"
-import {logout} from "../utils/auth";
 
 
 function App() {
@@ -94,7 +93,7 @@ function App() {
 
 
     function signOut() {
-        return logout()
+
             .then(() => {
                 localStorage.removeItem("jwt");
                 setIsLoggedIn(false);
