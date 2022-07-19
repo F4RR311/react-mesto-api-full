@@ -7,55 +7,37 @@ function checkResponse(res) {
 
 export const BASE_URL = "https://api.mymesto.nomoredomains.xyz";
 
-export function registerUser(email, password) {
+export function registerUser(password, email) {
     return fetch(`${BASE_URL}/signup`, {
         method: 'POST',
         credentials: 'include',
         headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
+            'Content-Type': 'application/json'
         },
-        body: JSON.stringify({email, password}),
+        body: JSON.stringify({password, email})
 
     }).then(checkResponse);
 }
 
-export function loginUser(email, password) {
+export function loginUser(password, email) {
     return fetch(`${BASE_URL}/signin`, {
         method: 'POST',
         credentials: 'include',
         headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
+            'Content-Type': 'application/json'
         },
-        body: JSON.stringify({email, password}),
+        body: JSON.stringify({password, email}),
 
     }).then(checkResponse);
 }
 
-export function getToken(token) {
+export function getToken(jwt) {
     return fetch(`${BASE_URL}/users/me`, {
         method: 'GET',
-              headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-          //  'Authorization': `Bearer ${token}`,
+        credentials: 'include',
+        headers: {
+            "Content-Type": "application/json",
+            'Authorization': `Bearer ${jwt}`,
         },
-        credentials: 'include',
-    }).then((res) => {
-        if (res.status === 400) {
-            throw new Error("Токен не передан или передан не в том формате");
-        } else if (res.status === 401) {
-            throw new Error("Переданный токен некорректен");
-        } else return res.json();
-    });
-}
-
-export function logout(email) {
-    return fetch(`${BASE_URL}/signout`, {
-        method: 'POST',
-        credentials: 'include',
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({email})
-    })
+    }).then(checkResponse);
 }

@@ -103,8 +103,6 @@ class Api {
 export const api = new Api({
     baseUrl: 'https://api.mymesto.nomoredomains.xyz',
     headers: {
-        'Authorization': `Bearer ${localStorage.getItem('jwt')}`,
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
+        'Content-Type': 'application/json'
     }
 });

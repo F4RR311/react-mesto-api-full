@@ -10,15 +10,15 @@ const { NODE_ENV, JWT_SECRET } = process.env;
 
 module.exports.getUser = (req, res, next) => {
   User.find({})
-    .then((users) => res.send(users))
+    .then((users) => res.send({ data: users }))
     .catch(next);
 };
 
 module.exports.getUserMe = (req, res, next) => {
-  User.findById(req.params.userId)
+  User.findById(req.user._id)
     .orFail(() => new ErrorNotFound('Запрашиваемый пользователь не найден'))
     .then((user) => {
-      res.status(200).send(user);
+      res.status(200).send({ data: user });
     })
     .catch(next);
 };
@@ -45,20 +45,6 @@ module.exports.login = (req, res, next) => {
     .catch(() => {
       next(new Unauthorized('Не правильный логин или пароль'));
     });
-};
-
-module.exports.logout = (req, res, next) => {
-  const { email } = req.body;
-  User.findOne({ email })
-    .then(() => {
-      res.clearCookie('jwt', {
-        httpOnly: true,
-        httpsOnly: true,
-        sameSite: true,
-      })
-        .end();
-    })
-    .catch(next);
 };
 
 module.exports.getUserId = (req, res, next) => {
@@ -97,7 +83,6 @@ module.exports.createUser = (req, res, next) => {
         about: user.about,
         avatar: user.avatar,
         email: user.email,
-        _id: user._id,
       },
     }))
     .catch((err) => {
@@ -115,7 +100,6 @@ module.exports.createUser = (req, res, next) => {
 module.exports.updateUserInfo = (req, res, next) => {
   const { name, about } = req.body;
   const userId = req.user._id;
-
   User.findByIdAndUpdate(userId, { name, about }, { new: true, runValidators: true })
     .then((user) => {
       if (!user) {

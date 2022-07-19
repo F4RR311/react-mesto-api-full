@@ -35,7 +35,7 @@ function App() {
     const [infoTooltip, setInfoTooltip] = useState(false);
 
     useEffect(() => {
-    //    handleTokenCheck();
+        handleTokenCheck();
         if (isLoggedIn) {
             Promise.all([api.getProfile(), api.getInitialCards()])
                 .then(([user, cards]) => {
@@ -75,26 +75,25 @@ function App() {
     }
 
     function onLogin(email, password) {
-        auth.loginUser(email, password)
-            .then(({token}) => {
-                localStorage.setItem("jwt", token);
-                setIsLoggedIn(true);
-                setEmailName(email);
-                navigate('/');
-            })
+        auth.loginUser(email, password).then((res) => {
+            localStorage.setItem("jwt", res.token);
+            setIsLoggedIn(true);
+            setEmailName(email);
+            navigate('/');
+        })
             .catch(() => {
                 setPopupImage(reject);
                 setPopupTitle('Что-то пошло не так! Попробуйте ещё раз');
                 handleInfoTooltip();
             })
-
     }
-        useEffect(() => {
-            handleTokenCheck();
-        }, []);
+
+    useEffect(() => {
+        handleTokenCheck();
+    }, []);
 
 
-        function signOut() {
+    function signOut() {
         return logout()
             .then(() => {
                 localStorage.removeItem("jwt");
@@ -107,9 +106,9 @@ function App() {
     }
 
     function handleTokenCheck() {
-        const jwt = localStorage.getItem('jwt');
-        if (jwt) {
-            auth.getToken(jwt)
+        const token = localStorage.getItem('token');
+        if (token) {
+            auth.getToken(token)
                 .then((res) => {
                     setIsLoggedIn(true);
                     navigate('/');
