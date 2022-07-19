@@ -54,10 +54,15 @@ function App() {
     /* Вход */
     function onLogin(email, password) {
         auth.loginUser(email, password).then((res) => {
-            localStorage.setItem("jwt", res.token);
-            setIsLoggedIn(true);
-            setEmailName(email);
-            navigate('/');
+            if (res.email) {
+                setLoggedIn(true);
+                setUserData({ _id: res._id, email: res.email });
+                localStorage.setItem("email", res.email);
+                handleCheckToken();
+
+                navigate('/');
+            }
+
         })
             .catch(() => {
                 setPopupImage(reject);
@@ -76,9 +81,10 @@ function App() {
         handleTokenCheck();
     }, []);
 
-    function onRegister(email, password) {
-        auth.registerUser(email, password).then(() => {
-            setPopupImage(resolve);
+    function onRegister({email, password}) {
+        auth.registerUser(email, password).then((res) => {
+            const { email } = res;
+            setUserData({ ...userData, email });
             setPopupTitle('Вы успешно зарегистрировались');
             navigate('/sign-in');
         })
