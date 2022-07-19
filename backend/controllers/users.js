@@ -8,6 +8,52 @@ const Unauthorized = require('../errors/Unauthorized');
 
 const { NODE_ENV, JWT_SECRET } = process.env;
 
+module.exports.login = (req, res, next) => {
+  const { email, password } = req.body;
+
+  return User.findUserByCredentials(email, password)
+    .then((user) => {
+      const token = jwt.sign(
+        { _id: user._id },
+        NODE_ENV === 'production' ? JWT_SECRET : 'secret-key',
+        { expiresIn: '7d' },
+      );
+      res.cookie('jwt', token, {
+        maxAge: 3600000 * 24 * 7,
+        httpOnly: true,
+      });
+      res
+        .status(200)
+        .send({ token, NODE_ENV, JWT_SECRET });
+    })
+    .catch(next);
+};
+
+// module.exports.login = (req, res, next) => {
+//   const { email, password } = req.body;
+//
+//   User.findOne({ email }).select('+password')
+//     .then((user) => {
+//       if (!user) {
+//         throw new Unauthorized('Неправильные почта или пароль');
+//       }
+//
+//       return Promise.all([user, bcrypt.compare(password, user.password)]);
+//     })
+//     .then(([user, isPasswordCorrect]) => {
+//       if (!isPasswordCorrect) {
+//         throw new Unauthorized('Неправильная почта или пароль');
+//       }
+//       const token = jwt.sign(
+//         { _id: user._id },
+//         NODE_ENV === 'production' ? JWT_SECRET : 'secret-key',
+//         { expiresIn: '7d' },
+//       );
+//       return res.send({ token });
+//     })
+//     .catch(next);
+// };
+
 module.exports.getUser = (req, res, next) => {
   User.find({})
     .then((users) => res.send(users))
@@ -23,30 +69,7 @@ module.exports.getUserMe = (req, res, next) => {
     .catch(next);
 };
 
-module.exports.login = (req, res, next) => {
-  const { email, password } = req.body;
 
-  User.findOne({ email }).select('+password')
-    .then((user) => {
-      if (!user) {
-        throw new Unauthorized('Неправильные почта или пароль');
-      }
-
-      return Promise.all([user, bcrypt.compare(password, user.password)]);
-    })
-    .then(([user, isPasswordCorrect]) => {
-      if (!isPasswordCorrect) {
-        throw new Unauthorized('Неправильная почта или пароль');
-      }
-      const token = jwt.sign(
-        { _id: user._id },
-        NODE_ENV === 'production' ? JWT_SECRET : 'secret-key',
-        { expiresIn: '7d' },
-      );
-      return res.send({ token });
-    })
-    .catch(next);
-};
 module.exports.getUserId = (req, res, next) => {
   const { userId } = req.params;
   User.findById(userId)

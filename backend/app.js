@@ -13,33 +13,32 @@ const { createUser, login } = require('./controllers/users');
 const auth = require('./middlewares/auth');
 const errorHandler = require('./middlewares/errorHandler');
 const ErrorNotFound = require('./errors/ErrorNotFound');
-//const cors = require('./middlewares/cors');
+const cors = require('./middlewares/cors');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
-const cors = require('cors');
+//const cors = require('cors');
 // Слушаем 3000 порт
-const { PORT = 3001 } = process.env;
+const { PORT = 3000 } = process.env;
 
 
 
-const allowedCors = {
-  origin: [
-    'domainname.students.nomoredomains.sbs',
-    'http://domainname.students.nomoredomains.sbs',
-    'http://domainname.students.nomoredomains.sbs',
-    'https://api.mymesto.nomoredomains.xyz',
-    'http://api.mymesto.nomoredomains.xyz',
-    'localhost:3000',
-    'http://localhost:3000',
-    'localhost:3001',
-    'http://localhost:3001',
-  ],
-  credentials: true,
-  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-};
+// const allowedCors = {
+//   origin: [
+//     'http://localhost:3000',
+//     'http://domainname.students.nomoredomains.sbs',
+//     'http://domainname.students.nomoredomains.sbs',
+//     'http://api.mymesto.nomoredomains.xyz',
+//     'https://api.mymesto.nomoredomains.xyz',
+//     'domainname.students.nomoredomains.sbs',
+//     'https://github.com/F4RR311',
+//
+//   ],
+//   credentials: true,
+//   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+// };
 mongoose.connect('mongodb://127.0.0.1:27017/mestodb', { useNewUrlParser: true });
 
+app.use(cors({ origin: 'https://domainname.students.nomoredomains.sbs', credentials: true }));
 
-app.use(cors(allowedCors));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
@@ -54,21 +53,29 @@ app.get('/crash-test', () => {
 
 app.post('/signin', validLogin, login);
 app.post('/signup', validUser, createUser);
-app.use('/users', auth, usersRoutes);
-app.use('/cards', auth, cardsRoutes);
+app.use('/users',  usersRoutes);
+app.use('/cards',  cardsRoutes);
 
 // app.get('/signout', (req, res) => {
 //   res.clearCookie('jwt').send({ message: 'Выход' });
 // });
 
-app.use('*', (req, res, next) => next(
-  new NotFoundError('Запрошен не существующий ресурс'),
-));
-
-
+app.use(auth);
 app.use(errors());
 app.use(errorHandler);
 app.use(errorLogger);
+
+app.use((err, req, res, next) => {
+  const { statusCode = 500, message } = err;
+
+  res
+    .status(statusCode)
+    .send({
+      message: statusCode === 500
+        ? 'На сервере произошла ошибка'
+        : message,
+    });
+});
 
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`);

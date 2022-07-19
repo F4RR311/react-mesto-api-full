@@ -34,7 +34,7 @@ function App() {
     const [infoTooltip, setInfoTooltip] = useState(false);
 
     useEffect(() => {
-        handleTokenCheck();
+
         if (isLoggedIn) {
             Promise.all([api.getProfile(), api.getInitialCards()])
                 .then(([user, cards]) => {
@@ -48,23 +48,17 @@ function App() {
 
     }, [isLoggedIn]);
 
-    useEffect(() => {
-        handleTokenCheck();
-    }, []);
-    useEffect(() => {
-        if (isLoggedIn === true) {
-            navigate('/');
-        }
-    }, [isLoggedIn, navigate])
 
+    /* Вход */
     function onLogin(email, password) {
-        auth.loginUser(email, password).then((res) => {
-            localStorage.setItem('token', res.token);
-            handleTokenCheck();
-            setIsLoggedIn(true);
-            setEmailName(email);
-            navigate('/');
-        })
+        auth.loginUser(email, password)
+            .then((res) => {
+                localStorage.setItem('jwt', res.token);
+                handleTokenCheck();
+                setIsLoggedIn(true);
+                setEmailName(res.email);
+                navigate('/');
+            })
             .catch(() => {
                 setPopupImage(reject);
                 setPopupTitle('Что-то пошло не так! Попробуйте ещё раз');
@@ -72,12 +66,23 @@ function App() {
             })
     }
 
+    useEffect(() => {
+        if (isLoggedIn === true) {
+            navigate('/');
+        }
+    }, [isLoggedIn, navigate])
+
+    useEffect(() => {
+        handleTokenCheck();
+    }, []);
+
     function onRegister(email, password) {
-        auth.registerUser(email, password).then(() => {
-            setPopupImage(resolve);
-            setPopupTitle('Вы успешно зарегистрировались');
-            navigate('/sign-in');
-        })
+        auth.registerUser(email, password)
+            .then((res) => {
+                setPopupImage(resolve);
+                setPopupTitle('Вы успешно зарегистрировались');
+                navigate('/sign-in');
+            })
             .catch(() => {
                 setPopupImage(reject);
                 setPopupTitle("Что-то пошло не так! Попробуйте ещё раз");
@@ -90,10 +95,9 @@ function App() {
         const jwt = localStorage.getItem('token');
         if (jwt) {
             api.getProfile()
-                // auth.getToken(jwt)
+            auth.getToken(jwt)
                 .then((res) => {
-
-                    if (res.data) {
+                    if (res.data?.email) {
                         setIsLoggedIn(true);
                         navigate('/');
                         setEmailName(res.data.email);
