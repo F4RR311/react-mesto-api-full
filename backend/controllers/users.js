@@ -23,9 +23,9 @@ module.exports.getUserMe = (req, res, next) => {
     .catch(next);
 };
 
-module.exports.login = (req, res, next) => {
+mmodule.exports.login = (req, res, next) => {
   const { email, password } = req.body;
-   User.findUserByCredentials(email, password)
+  return User.findUserByCredentials(email, password)
     .then((user) => {
       const token = jwt.sign(
         { _id: user._id },
@@ -35,16 +35,12 @@ module.exports.login = (req, res, next) => {
       res.cookie('jwt', token, {
         maxAge: 3600000 * 24 * 7,
         httpOnly: true,
-        SameSite:true,
+        SameSite:'none',
         Secure:true
       });
-      res.status(200).send({
-        name: user.name,
-        about: user.about,
-        avatar: user.avatar,
-        email: user.email,
-        _id: user._id,
-      });
+      res
+        .status(200)
+        .send({ message: 'Вход выполнен' });
     })
     .catch(() => {
       next(new Unauthorized('Не правильный логин или пароль'));
