@@ -49,11 +49,28 @@ function App() {
     }, [isLoggedIn]);
 
     useEffect(() => {
+        handleTokenCheck();
+    }, []);
+    useEffect(() => {
         if (isLoggedIn === true) {
             navigate('/');
         }
     }, [isLoggedIn, navigate])
 
+    function onLogin(email, password) {
+        auth.loginUser(email, password).then((res) => {
+            localStorage.setItem('token', res.token);
+            handleTokenCheck();
+            setIsLoggedIn(true);
+            setEmailName(email);
+            navigate('/');
+        })
+            .catch(() => {
+                setPopupImage(reject);
+                setPopupTitle('Что-то пошло не так! Попробуйте ещё раз');
+                handleInfoTooltip();
+            })
+    }
 
     function onRegister(email, password) {
         auth.registerUser(email, password).then(() => {
@@ -68,18 +85,22 @@ function App() {
             .finally(handleInfoTooltip(true));
     }
 
-    function onLogin(email, password) {
-        auth.loginUser(email, password).then((res) => {
-            localStorage.setItem("jwt", res.token);
-            setIsLoggedIn(true);
-            setEmailName(email);
-            navigate('/');
-        })
-            .catch(() => {
-                setPopupImage(reject);
-                setPopupTitle('Что-то пошло не так! Попробуйте ещё раз');
-                handleInfoTooltip();
-            })
+
+    function handleTokenCheck() {
+        const jwt = localStorage.getItem('token');
+        if (jwt) {
+            api.getProfile()
+                // auth.getToken(jwt)
+                .then((res) => {
+
+                    if (res.data) {
+                        setIsLoggedIn(true);
+                        navigate('/');
+                        setEmailName(res.data.email);
+                    }
+                })
+                .catch((err) => console.log(err));
+        }
     }
 
     function signOut() {
@@ -87,19 +108,6 @@ function App() {
         setEmailName(null);
         navigate("/sign-in");
         localStorage.removeItem("jwt");
-    }
-
-    function handleTokenCheck() {
-        const jwt = localStorage.getItem('jwt');
-        if (jwt) {
-            auth.getToken(jwt)
-                .then((res) => {
-                    setIsLoggedIn(true);
-                    navigate('/');
-                    setEmailName(res.email);
-                })
-                .catch((err) => console.log(err));
-        }
     }
 
     function handleEditAvatarClick() {
@@ -198,8 +206,6 @@ function App() {
             }
         }
     }, [isEditProfilePopupOpen, isAddPlacePopupOpen, isEditAvatarPopupOpen, isAddPlacePopupOpen, selectedCard]);
-
-
 
 
     return (

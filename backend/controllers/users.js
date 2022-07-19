@@ -25,28 +25,28 @@ module.exports.getUserMe = (req, res, next) => {
 
 module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
-  return User.findUserByCredentials(email, password)
+
+  User.findOne({ email }).select('+password')
     .then((user) => {
+      if (!user) {
+        throw new Unauthorized('Неправильные почта или пароль');
+      }
+
+      return Promise.all([user, bcrypt.compare(password, user.password)]);
+    })
+    .then(([user, isPasswordCorrect]) => {
+      if (!isPasswordCorrect) {
+        throw new Unauthorized('Неправильная почта или пароль');
+      }
       const token = jwt.sign(
         { _id: user._id },
         NODE_ENV === 'production' ? JWT_SECRET : 'secret-key',
         { expiresIn: '7d' },
       );
-      res.cookie('jwt', token, {
-        maxAge: 3600000 * 24 * 7,
-        httpOnly: true,
-        SameSite:'none',
-        Secure:true
-      });
-      res
-        .status(200)
-        .send({ message: 'Вход выполнен' });
+      return res.send({ token });
     })
-    .catch(() => {
-      next(new Unauthorized('Не правильный логин или пароль'));
-    });
+    .catch(next);
 };
-
 module.exports.getUserId = (req, res, next) => {
   const { userId } = req.params;
   User.findById(userId)
