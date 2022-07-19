@@ -93,14 +93,11 @@ function App() {
 
 
     function signOut() {
-
-
                 localStorage.removeItem("jwt");
                 setIsLoggedIn(false);
                 setEmailName(null);
                 navigate("/sign-in");
 
-            .catch(err => console.log(err.message));
 
     }
 
