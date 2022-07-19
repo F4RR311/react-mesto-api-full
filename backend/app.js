@@ -23,9 +23,15 @@ const { PORT = 3001 } = process.env;
 
 const allowedCors = {
   origin: [
+    'domainname.students.nomoredomains.sbs',
+    'http://domainname.students.nomoredomains.sbs',
+    'http://domainname.students.nomoredomains.sbs',
+    'https://api.mymesto.nomoredomains.xyz',
+    'http://api.mymesto.nomoredomains.xyz',
+    'localhost:3000',
+    'http://localhost:3000',
+    'localhost:3001',
     'http://localhost:3001',
-    'http://domainname.students.nomoredomains.sbs',
-    'http://domainname.students.nomoredomains.sbs',
   ],
   credentials: true,
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
