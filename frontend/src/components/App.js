@@ -29,11 +29,9 @@ function App() {
     const [cards, setCards] = useState([]);
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [emailName, setEmailName] = useState(null);
-
     const [popupImage, setPopupImage] = useState('');
     const [popupTitle, setPopupTitle] = useState('');
     const [infoTooltip, setInfoTooltip] = useState(false);
-    const [userData, setUserData] = useState({_id: "", email: ""});
 
     useEffect(() => {
 
@@ -52,18 +50,14 @@ function App() {
 
 
     /* Вход */
-    function onLogin(email, password) {
-        auth.loginUser(email, password).then((res) => {
-            if (res.email) {
+    function onLogin({email, password}) {
+        auth.loginUser(email, password)
+            .then((res) => {
+                localStorage.setItem("jwt", res.token);
                 setIsLoggedIn(true);
-                setUserData({ _id: res._id, email: res.email });
-                localStorage.setItem("email", res.email);
-                handleTokenCheck();
-
+                setEmailName(email);
                 navigate('/');
-            }
-
-        })
+            })
             .catch(() => {
                 setPopupImage(reject);
                 setPopupTitle('Что-то пошло не так! Попробуйте ещё раз');
@@ -81,13 +75,13 @@ function App() {
         handleTokenCheck();
     }, []);
 
-    function onRegister(email, password) {
-        auth.registerUser(email, password).then((res) => {
-            const { email } = res;
-            setUserData({ ...userData, email });
-            setPopupTitle('Вы успешно зарегистрировались');
-            navigate('/sign-in');
-        })
+    function onRegister({email, password}) {
+        auth.registerUser(email, password)
+            .then((res) => {
+                setPopupImage(resolve);
+                setPopupTitle('Вы успешно зарегистрировались');
+                navigate('/sign-in');
+            })
             .catch(() => {
                 setPopupImage(reject);
                 setPopupTitle("Что-то пошло не так! Попробуйте ещё раз");
