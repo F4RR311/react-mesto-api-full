@@ -55,10 +55,10 @@ function App() {
     function onLogin(email, password) {
         auth.loginUser(email, password).then((res) => {
             if (res.email) {
-                setLoggedIn(true);
+                setIsLoggedIn(true);
                 setUserData({ _id: res._id, email: res.email });
                 localStorage.setItem("email", res.email);
-                handleCheckToken();
+                handleTokenCheck();
 
                 navigate('/');
             }
