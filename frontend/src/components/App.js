@@ -81,7 +81,7 @@ function App() {
         handleTokenCheck();
     }, []);
 
-    function onRegister({email, password}) {
+    function onRegister(email, password) {
         auth.registerUser(email, password).then((res) => {
             const { email } = res;
             setUserData({ ...userData, email });
