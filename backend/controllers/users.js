@@ -11,25 +11,27 @@ const { NODE_ENV, JWT_SECRET } = process.env;
 
 module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
-  User.findOne({ email }).select('+password')
+
+  User.findOne({ email })
+    .select("+password") // в случае аутентификации хеш пароля нужен
     .then((user) => {
       if (!user) {
-        throw new Unauthorized('Неправильные email или пароль (проверка юзера).');
+        return Promise.reject(new Unauthorized("Неправильные почта или пароль"));
       }
-      return bcrypt.compare(password, user.password)
-        .then((matched) => {
-          if (!matched) {
-            throw new Unauthorized('Неправильные email или пароль (проверка хеша).');
-          }
-
-          const token = jwt.sign({ _id: user._id }, NODE_ENV === 'production' ? JWT_SECRET : 'secret-key', { expiresIn: '7d' });
-          res.cookie('jwt', token, { maxAge: 3600000 * 24 * 7, httpOnly: true });
-          res.status(200).send({ _id: user._id, email: user.email });
-        })
-        .catch(next);
+      return Promise.all([bcrypt.compare(password, user.password), user]);
+    })
+    .then(([isPasswordCorrect, user]) => {
+      if (!isPasswordCorrect) {
+        return Promise.reject(new Unauthorized("Неправильная почта или пароль"));
+      }
+      const token = jwt.sign({ _id: user._id }, "secret-key", {
+        expiresIn: "7d",
+      });
+      return res.send({ token });
     })
     .catch(next);
 };
+
 // module.exports.login = (req, res, next) => {
 //   const { email, password } = req.body;
 //

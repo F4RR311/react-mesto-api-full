@@ -33,13 +33,15 @@ function App() {
     const [popupTitle, setPopupTitle] = useState('');
     const [infoTooltip, setInfoTooltip] = useState(false);
 
-    useEffect(() => {
 
+    useEffect(() => {
+        handleTokenCheck();
         if (isLoggedIn) {
-            Promise.all([api.getProfile(), api.getInitialCards()])
-                .then(([user, cards]) => {
-                    setCurrentUser(user)
-                    setCards(cards)
+            const token = localStorage.getItem('jwt');
+                  Promise.all([api.getProfile(token), api.getInitialCards(token)])
+                .then(([userData, cardData]) => {
+                    setCurrentUser(userData)
+                    setCards(cardData)
                 })
                 .catch((err) => {
                     console.error(err);
@@ -48,14 +50,29 @@ function App() {
 
     }, [isLoggedIn]);
 
+    useEffect(() => {
+        const token = localStorage.getItem('jwt');
+        api
+            .getProfile(token)
+            .then((res) => setCurrentUser(res))
+            .catch((err) => console.log(err));
+    }, []);
 
+    useEffect(() => {
+        const token = localStorage.getItem('jwt');
+        api
+            .getInitialCards(token)
+            .then((cards) => setCards(cards))
+            .catch((err) => console.log(err));
+    }, []);
     /* Вход */
-    function onLogin({email, password}) {
+    function onLogin(email, password) {
         auth.loginUser(email, password)
             .then((res) => {
                 localStorage.setItem("jwt", res.token);
-                setIsLoggedIn(true);
                 setEmailName(email);
+                setIsLoggedIn(true);
+
                 navigate('/');
             })
             .catch(() => {
@@ -65,22 +82,24 @@ function App() {
             })
     }
 
-    useEffect(() => {
-        if (isLoggedIn === true) {
-            navigate('/');
-        }
-    }, [isLoggedIn, navigate])
+    // useEffect(() => {
+    //     if (isLoggedIn === true) {
+    //         navigate('/');
+    //     }
+    // }, [isLoggedIn, navigate])
 
-    useEffect(() => {
-        handleTokenCheck();
-    }, []);
+    // useEffect(() => {
+    //     handleTokenCheck();
+    // }, []);
 
     function onRegister({email, password}) {
         auth.registerUser(email, password)
             .then((res) => {
+            if(res) {
                 setPopupImage(resolve);
                 setPopupTitle('Вы успешно зарегистрировались');
                 navigate('/sign-in');
+            }
             })
             .catch(() => {
                 setPopupImage(reject);
@@ -93,14 +112,11 @@ function App() {
     function handleTokenCheck() {
         const jwt = localStorage.getItem('token');
         if (jwt) {
-            api.getProfile()
             auth.getToken(jwt)
                 .then((res) => {
-                    if (res.data?.email) {
-                        setIsLoggedIn(true);
-                        navigate('/');
-                        setEmailName(res.data.email);
-                    }
+                    setIsLoggedIn(true);
+                    navigate('/');
+                    setEmailName(res.data.email);
                 })
                 .catch((err) => console.log(err));
         }

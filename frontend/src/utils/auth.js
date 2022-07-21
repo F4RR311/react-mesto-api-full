@@ -12,9 +12,12 @@ export function registerUser(email, password ) {
         method: 'POST',
         credentials: 'include',
         headers: {
+            Accept: "application/json",
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({email, password}),
+        body: JSON.stringify({
+            email: email,
+            password: password,}),
 
     }).then(checkResponse);
 }
@@ -24,9 +27,12 @@ export function loginUser(email, password) {
         method: 'POST',
         credentials: 'include',
         headers: {
+            Accept: "application/json",
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({email, password}),
+        body: JSON.stringify({
+            email: email,
+            password: password,}),
 
     }).then(checkResponse);
 }
@@ -37,7 +43,7 @@ export function getToken() {
         credentials: 'include',
         headers: {
             "Content-Type": "application/json",
-        //    'Authorization': `Bearer ${jwt}`,
+            Authorization: `Bearer ${localStorage.getItem("jwt")}`,
         },
     }).then(checkResponse);
 }

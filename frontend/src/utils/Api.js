@@ -12,10 +12,11 @@ class Api {
         }
     }
 
-    getProfile() {
+    getProfile(token) {
         return fetch(`${this._baseUrl}/users/me`, {
             credentials: 'include',
-      headers: this._headers,
+            headers: this._headers,
+            Authorization: `Bearer ${token}`,
 
         })
             .then(this._checkResponse)
@@ -23,10 +24,11 @@ class Api {
 
     }
 
-    getInitialCards() {
+    getInitialCards(token) {
         return fetch(`${this._baseUrl}/cards`, {
             credentials: 'include',
-      headers: this._headers,
+            headers: this._headers,
+            Authorization: `Bearer ${token}`,
 
         })
             .then(this._checkResponse)
