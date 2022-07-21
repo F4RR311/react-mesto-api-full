@@ -1,7 +1,8 @@
 const bcrypt = require('bcryptjs');
 const mongoose = require('mongoose');
-const { isEmail, isURL } = require('validator');
+
 const Unauthorized = require('../errors/Unauthorized');
+const validator = require('validator');
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -15,9 +16,7 @@ const userSchema = new mongoose.Schema({
     required: true,
     unique: true,
     validate: {
-      validator(email) {
-        return isEmail(email);
-      },
+      validator: (mail) => validator.isEmail(mail),
     },
   },
   password: {
@@ -38,12 +37,12 @@ const userSchema = new mongoose.Schema({
     default: 'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
     validate: {
       validator(link) {
-        return isURL(link);
+        return validator.isURL(link);
       },
     },
   },
 });
-
+module.exports = mongoose.model('user', userSchema);
 // userSchema.statics.findUserByCredentials = function findUserByCredentials(email, password) {
 //   return this.findOne({ email }).select('+password')
 //     .then((user) => {
@@ -60,4 +59,4 @@ const userSchema = new mongoose.Schema({
 //     });
 // };
 
-module.exports = mongoose.model('user', userSchema);
+

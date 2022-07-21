@@ -37,8 +37,7 @@ function App() {
     useEffect(() => {
         handleTokenCheck();
         if (isLoggedIn) {
-            const token = localStorage.getItem('jwt');
-                  Promise.all([api.getProfile(token), api.getInitialCards(token)])
+            Promise.all([api.getProfile(), api.getInitialCards()])
                 .then(([userData, cardData]) => {
                     setCurrentUser(userData)
                     setCards(cardData)
@@ -61,10 +60,11 @@ function App() {
     useEffect(() => {
         const token = localStorage.getItem('jwt');
         api
-            .getInitialCards(token)
+            .getInitialCards()
             .then((cards) => setCards(cards))
             .catch((err) => console.log(err));
     }, []);
+
     /* Вход */
     function onLogin(email, password) {
         auth.loginUser(email, password)
@@ -82,24 +82,15 @@ function App() {
             })
     }
 
-    // useEffect(() => {
-    //     if (isLoggedIn === true) {
-    //         navigate('/');
-    //     }
-    // }, [isLoggedIn, navigate])
 
-    // useEffect(() => {
-    //     handleTokenCheck();
-    // }, []);
-
-    function onRegister({email, password}) {
+    function onRegister(email, password) {
         auth.registerUser(email, password)
             .then((res) => {
-            if(res) {
-                setPopupImage(resolve);
-                setPopupTitle('Вы успешно зарегистрировались');
-                navigate('/sign-in');
-            }
+                if (res) {
+                    setPopupImage(resolve);
+                    setPopupTitle('Вы успешно зарегистрировались');
+                    navigate('/sign-in');
+                }
             })
             .catch(() => {
                 setPopupImage(reject);
@@ -108,9 +99,14 @@ function App() {
             .finally(handleInfoTooltip(true));
     }
 
+    useEffect(() => {
+        if (isLoggedIn === true) {
+            navigate('/');
+        }
+    }, [isLoggedIn, navigate])
 
     function handleTokenCheck() {
-        const jwt = localStorage.getItem('token');
+        const jwt = localStorage.getItem('jwt');
         if (jwt) {
             auth.getToken(jwt)
                 .then((res) => {
