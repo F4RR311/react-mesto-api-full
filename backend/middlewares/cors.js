@@ -16,7 +16,7 @@ const allowedCors = {
 };
 
 
-module.exports = ((req, res, next) => {
+module.exports.cors = ((req, res, next) => {
   const { origin } = req.headers;
   const { method } = req;
 
