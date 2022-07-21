@@ -69,11 +69,18 @@ function App() {
     function onLogin(email, password) {
         auth.loginUser(email, password)
             .then((res) => {
-                localStorage.setItem("jwt", res.token);
-                setEmailName(email);
-                setIsLoggedIn(true);
-
-                navigate('/');
+                if (res.token) {
+                    localStorage.setItem("jwt", res.token);
+                    return res
+                }
+            })
+            .then((res) => {
+                if (res.token) {
+                    setIsLoggedIn(true);
+                    handleTokenCheck();
+                    setEmailName(email);
+                    navigate('/');
+                }
             })
             .catch(() => {
                 setPopupImage(reject);
@@ -112,7 +119,8 @@ function App() {
                 .then((res) => {
                     setIsLoggedIn(true);
                     navigate('/');
-                    setEmailName(res.data.email);
+                    //TODO проверяем имейл уточнить.
+                    setEmailName(res.email);
                 })
                 .catch((err) => console.log(err));
         }
