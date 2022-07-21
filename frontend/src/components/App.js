@@ -37,7 +37,8 @@ function App() {
     useEffect(() => {
         handleTokenCheck();
         if (isLoggedIn) {
-            Promise.all([api.getProfile(), api.getInitialCards()])
+            const token = localStorage.getItem('jwt');
+            Promise.all([api.getProfile(token), api.getInitialCards(token)])
                 .then(([userData, cardData]) => {
                     setCurrentUser(userData)
                     setCards(cardData)
@@ -60,7 +61,7 @@ function App() {
     useEffect(() => {
         const token = localStorage.getItem('jwt');
         api
-            .getInitialCards()
+            .getInitialCards(token)
             .then((cards) => setCards(cards))
             .catch((err) => console.log(err));
     }, []);
@@ -106,11 +107,11 @@ function App() {
             .finally(handleInfoTooltip(true));
     }
 
-    useEffect(() => {
-        if (isLoggedIn === true) {
-            navigate('/');
-        }
-    }, [isLoggedIn, navigate])
+    // useEffect(() => {
+    //     if (isLoggedIn === true) {
+    //         navigate('/');
+    //     }
+    // }, [isLoggedIn, navigate])
 
     function handleTokenCheck() {
         const jwt = localStorage.getItem('jwt');
