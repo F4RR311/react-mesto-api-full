@@ -35,7 +35,7 @@ function App() {
 
 
     useEffect(() => {
-        handleTokenCheck();
+    //    handleTokenCheck();
         if (isLoggedIn) {
             const token = localStorage.getItem('jwt');
             Promise.all([api.getProfile(token), api.getInitialCards(token)])
