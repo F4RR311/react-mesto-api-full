@@ -16,8 +16,6 @@ class Api {
         return fetch(`${this._baseUrl}/users/me`, {
             credentials: 'include',
             Authorization: `Bearer ${token}`,
-
-
         })
             .then(this._checkResponse)
 
@@ -26,7 +24,6 @@ class Api {
 
     getInitialCards(token) {
         return fetch(`${this._baseUrl}/cards`, {
-            credentials: 'include',
             headers: {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${token}`,
@@ -41,7 +38,7 @@ class Api {
     editProfile(data, token) {
         return fetch(`${this._baseUrl}/users/me`, {
             method: "PATCH",
-            credentials: 'include',
+      //      credentials: 'include',
             headers: {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${token}`,
@@ -58,7 +55,7 @@ class Api {
     }
 
 
-    addCard(data,token) {
+    addCard(data, token) {
         return fetch(`${this._baseUrl}/cards`, {
             method: "POST",
             headers: {
@@ -74,7 +71,7 @@ class Api {
             .then(this._checkResponse)
     }
 
-    removeCard(data,token) {
+    removeCard(data, token) {
         return fetch(`${this._baseUrl}/cards/${data._id}`, {
             method: "DELETE",
             credentials: 'include',
@@ -100,7 +97,7 @@ class Api {
 
     }
 
-    addAvatar(data,token) {
+    addAvatar(data, token) {
         return fetch(`${this._baseUrl}/users/me/avatar`, {
             method: 'PATCH',
             headers: {

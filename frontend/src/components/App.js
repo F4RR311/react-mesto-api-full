@@ -68,7 +68,8 @@ function App() {
 
     /* Вход */
     function onLogin(email, password) {
-        auth.loginUser(email, password)
+        auth
+            .loginUser(email, password)
             .then((res) => {
                 localStorage.setItem("jwt", res.token);
                 setEmailName(email);
@@ -77,7 +78,6 @@ function App() {
                 navigate('/');
 
             })
-
             .catch(() => {
                 setPopupImage(reject);
                 setPopupTitle('Что-то пошло не так! Попробуйте ещё раз');
@@ -101,12 +101,6 @@ function App() {
             })
             .finally(handleInfoTooltip(true));
     }
-
-    // useEffect(() => {
-    //     if (isLoggedIn === true) {
-    //         navigate('/');
-    //     }
-    // }, [isLoggedIn, navigate])
 
     function handleTokenCheck() {
         const jwt = localStorage.getItem('jwt');
@@ -154,7 +148,9 @@ function App() {
     }
 
     function handleUpdateUser(data) {
-        api.editProfile(data).then((newUser) => {
+        const token = localStorage.getItem('jwt');
+
+        api.editProfile(data, token).then((newUser) => {
 
             setCurrentUser(newUser);
             closeAllPopups();
@@ -165,7 +161,9 @@ function App() {
     }
 
     function handleUpdateAvatar(data) {
-        api.addAvatar(data).then((newAvatar) => {
+
+        const token = localStorage.getItem('jwt');
+        api.addAvatar(data, token).then((newAvatar) => {
             setCurrentUser(newAvatar);
             closeAllPopups();
         })
@@ -202,7 +200,10 @@ function App() {
     }
 
     function handleAddPlaceSubmit(data) {
-        api.addCard(data).then((newCard) => {
+        const token = localStorage.getItem('jwt');
+
+
+        api.addCard(data, token).then((newCard) => {
             setCards([newCard, ...cards]);
             closeAllPopups();
         }).catch((err) => {
