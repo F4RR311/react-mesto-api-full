@@ -37,13 +37,13 @@ export function loginUser(email, password) {
     }).then(checkResponse);
 }
 
-export function getToken(token) {
+export function getToken() {
     return fetch(`${BASE_URL}/users/me`, {
         method: 'GET',
         credentials: 'include',
         headers: {
             "Content-Type": "application/json",
-            authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${localStorage.getItem("jwt")}`,
         },
     }).then(checkResponse);
 }

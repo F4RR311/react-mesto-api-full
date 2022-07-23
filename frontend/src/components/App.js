@@ -70,19 +70,14 @@ function App() {
     function onLogin(email, password) {
         auth.loginUser(email, password)
             .then((res) => {
-                if (res.token) {
-                    localStorage.setItem("jwt", res.token);
-                    return res
-                }
+                localStorage.setItem("jwt", res.token);
+                setEmailName(email);
+                setIsLoggedIn(true);
+                //  handleTokenCheck();
+                navigate('/');
+
             })
-            .then((res) => {
-                if (res.token) {
-                    setIsLoggedIn(true);
-                    handleTokenCheck();
-                    setEmailName(email);
-                    navigate('/');
-                }
-            })
+
             .catch(() => {
                 setPopupImage(reject);
                 setPopupTitle('Что-то пошло не так! Попробуйте ещё раз');
@@ -121,7 +116,7 @@ function App() {
                     setIsLoggedIn(true);
                     navigate('/');
                     //TODO проверяем имейл уточнить.
-                    setEmailName(res.email);
+                    setEmailName(res.data.email);
                 })
                 .catch((err) => console.log(err));
         }

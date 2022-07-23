@@ -38,11 +38,15 @@ module.exports.getUser = (req, res, next) => {
     .catch(next);
 };
 
+// GET /users/me - возвращает информацию о текущем пользователе
 module.exports.getUserMe = (req, res, next) => {
   User.findById(req.user._id)
-    .orFail(() => new ErrorNotFound('Запрашиваемый пользователь не найден'))
     .then((user) => {
-      res.status(200).send(user);
+      if (!user) {
+        throw new ErrorNotFound("Пользователь по _id не найден");
+      }
+      return res.status(200).send(user);
+
     })
     .catch(next);
 };
