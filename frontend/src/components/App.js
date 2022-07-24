@@ -10,7 +10,7 @@ import EditaAvatarPopup from "./EditaAvatarPopup";
 import AddPlacePopup from "./AddPlacePopup";
 import Login from "./Login";
 import Register from "./Register";
-import * as auth from '../utils/auth'
+import * as auth from '../utils/auth.js'
 import {Routes, Route, Navigate, useNavigate} from "react-router-dom";
 import ProtectedRoute from "./ProtectedRoute";
 import InfoTooltip from "./InfoTooltip";
@@ -35,7 +35,7 @@ function App() {
 
 
     useEffect(() => {
-    //    handleTokenCheck();
+        handleTokenCheck();
         if (isLoggedIn) {
             const token = localStorage.getItem('jwt');
             Promise.all([api.getProfile(token), api.getInitialCards(token)])
@@ -43,9 +43,7 @@ function App() {
                     setCurrentUser(userData)
                     setCards(cardData)
                 })
-                .catch((err) => {
-                    console.error(err);
-                });
+                .catch((err) => console.log(`Ошибка ${err}`));
         }
 
     }, [isLoggedIn]);
@@ -72,9 +70,9 @@ function App() {
             .loginUser(email, password)
             .then((res) => {
                 localStorage.setItem("jwt", res.token);
-                setEmailName(email);
                 setIsLoggedIn(true);
-                //  handleTokenCheck();
+                setEmailName(email);
+//                handleTokenCheck();
                 navigate('/');
 
             })
@@ -105,11 +103,11 @@ function App() {
     function handleTokenCheck() {
         const jwt = localStorage.getItem('jwt');
         if (jwt) {
-            auth.getToken(jwt)
+            auth
+                .getToken(jwt)
                 .then((res) => {
                     setIsLoggedIn(true);
                     navigate('/');
-                    //TODO проверяем имейл уточнить.
                     setEmailName(res.data.email);
                 })
                 .catch((err) => console.log(err));
@@ -117,10 +115,11 @@ function App() {
     }
 
     function signOut() {
+        localStorage.removeItem("jwt");
         setIsLoggedIn(false);
         setEmailName(null);
         navigate("/sign-in");
-        localStorage.removeItem("jwt");
+
     }
 
     function handleEditAvatarClick() {

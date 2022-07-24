@@ -32,11 +32,11 @@ app.use(cookieParser());
 //app.use(helmet());
 app.use(requestLogger);
 
-app.get('/crash-test', () => {
-  setTimeout(() => {
-    throw new Error('Сервер сейчас упадёт');
-  }, 0);
-});
+// app.get('/crash-test', () => {
+//   setTimeout(() => {
+//     throw new Error('Сервер сейчас упадёт');
+//   }, 0);
+// });
 
 app.post('/signup', validUser, createUser);
 app.post('/signin', validLogin, login);
@@ -52,9 +52,18 @@ app.use(auth);
 app.use(errors());
 app.use(errorHandler);
 app.use(errorLogger);
-// app.use("*", (req, res, next) => {
-//   next(new NotFoundError("Страница не найдена"));
-// });
+app.use("*", (req, res, next) => {
+  next(new NotFoundError("Страница не найдена"));
+});
+
+app.use((err, req, res, next) => {
+  const { statusCode = 500, message } = err;
+  res.status(err.statusCode).send({
+    message: statusCode === 500 ? "Произошла ошибка на сервере" : message,
+  });
+  next();
+});
+
 
 
 app.listen(PORT, () => {

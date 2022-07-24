@@ -18,8 +18,6 @@ class Api {
             Authorization: `Bearer ${token}`,
         })
             .then(this._checkResponse)
-
-
     }
 
     getInitialCards(token) {
@@ -28,11 +26,8 @@ class Api {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${token}`,
             },
-
-
         })
             .then(this._checkResponse)
-
     }
 
     editProfile(data, token) {
@@ -120,6 +115,6 @@ class Api {
 export const api = new Api({
     baseUrl: 'https://api.mymesto.nomoredomains.xyz',
     headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
     }
 });

@@ -15,6 +15,11 @@ const Register = (props) => {
 
     function handleSubmit(e) {
         e.preventDefault();
+
+        if (!email || !password) {
+            return;
+        }
+
         props.onRegister(email, password);
     }
 
@@ -22,13 +27,16 @@ const Register = (props) => {
         <section className="login">
             <h2 className="login__title">Регистрация</h2>
             <form className="login__form" onSubmit={handleSubmit}>
-                <input className="login__input" placeholder="Email" value={email} onChange={handleEmailInput} required/>
-                <input className="login__input" type="password" placeholder="Пароль" value={password}
+                <input className="login__input" type="email"
+                       name="email" placeholder="Email" value={email} onChange={handleEmailInput} required/>
+                <input className="login__input" type="password" name="password" placeholder="Пароль" value={password}
                        onChange={handlePasswordInput} required/>
                 <button className="login__button" type="submit">Зарегистрироваться
                 </button>
             </form>
-            <p className="login__text"> Уже зарегистрированы? <Link className={"login__link"} to="/sign-in"> Войти</Link> </p>
+            <p className="login__text">Уже зарегистрированы?
+                <Link className={"login__link"} to="/sign-in">Войти</Link>
+            </p>
         </section>
     )
 }

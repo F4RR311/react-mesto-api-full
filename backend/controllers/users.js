@@ -110,7 +110,7 @@ module.exports.updateUserInfo = (req, res, next) => {
       if (!user) {
         throw new ErrorNotFound('Запрашиваемый пользователь не найден');
       }
-      res.send({ data: user });
+      res.send(user);
     })
     .catch((err) => {
       if (err.name === 'CastError' || err.name === 'ValidationError') {
