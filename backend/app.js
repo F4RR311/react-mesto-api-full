@@ -10,8 +10,8 @@ const { validLogin, validUser } = require('./middlewares/validation');
 const usersRoutes = require('./routes/users');
 const cardsRoutes = require('./routes/cards');
 const { createUser, login } = require('./controllers/users');
-const { cors } = require('./middlewares/cors');
-const {auth} = require('./middlewares/auth');
+const cors = require("./middlewares/cors");
+const auth = require('./middlewares/auth');
 const errorHandler = require('./middlewares/errorHandler');
 //const ErrorNotFound = require('./errors/ErrorNotFound');
 
