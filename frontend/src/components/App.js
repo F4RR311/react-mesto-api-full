@@ -11,7 +11,7 @@ import AddPlacePopup from "./AddPlacePopup";
 import Login from "./Login";
 import Register from "./Register";
 import * as auth from '../utils/auth.js'
-import {Routes, Route, Navigate, useNavigate} from "react-router-dom";
+import {Routes, Route, Navigate, useNavigate, Switch} from "react-router-dom";
 import ProtectedRoute from "./ProtectedRoute";
 import InfoTooltip from "./InfoTooltip";
 import resolve from "../images/resolve.svg"
@@ -32,95 +32,7 @@ function App() {
     const [popupImage, setPopupImage] = useState('');
     const [popupTitle, setPopupTitle] = useState('');
     const [infoTooltip, setInfoTooltip] = useState(false);
-
-
-    useEffect(() => {
-        handleTokenCheck();
-        if (isLoggedIn) {
-            const token = localStorage.getItem('jwt');
-            Promise.all([api.getProfile(token), api.getInitialCards(token)])
-                .then(([userData, cardData]) => {
-                    setCurrentUser(userData)
-                    setCards(cardData)
-                })
-                .catch((err) => console.log(`Ошибка ${err}`));
-        }
-
-    }, [isLoggedIn]);
-
-    useEffect(() => {
-        const token = localStorage.getItem('jwt');
-        api
-            .getProfile(token)
-            .then((res) => setCurrentUser(res))
-            .catch((err) => console.log(err));
-    }, []);
-
-    useEffect(() => {
-        const token = localStorage.getItem('jwt');
-        api
-            .getInitialCards(token)
-            .then((cards) => setCards(cards))
-            .catch((err) => console.log(err));
-    }, []);
-
-    /* Вход */
-    function onLogin(email, password) {
-        auth
-            .loginUser(email, password)
-            .then((res) => {
-                localStorage.setItem("jwt", res.token);
-                setIsLoggedIn(true);
-                setEmailName(email);
-//                handleTokenCheck();
-                navigate('/');
-
-            })
-            .catch(() => {
-                setPopupImage(reject);
-                setPopupTitle('Что-то пошло не так! Попробуйте ещё раз');
-                handleInfoTooltip();
-            })
-    }
-
-
-    function onRegister(email, password) {
-        auth.registerUser(email, password)
-            .then((res) => {
-                if (res) {
-                    setPopupImage(resolve);
-                    setPopupTitle('Вы успешно зарегистрировались');
-                    navigate('/sign-in');
-                }
-            })
-            .catch(() => {
-                setPopupImage(reject);
-                setPopupTitle("Что-то пошло не так! Попробуйте ещё раз");
-            })
-            .finally(handleInfoTooltip(true));
-    }
-
-    function handleTokenCheck() {
-        const jwt = localStorage.getItem('jwt');
-        if (jwt) {
-            auth
-                .getToken(jwt)
-                .then((res) => {
-                    setIsLoggedIn(true);
-                    navigate('/');
-                    setEmailName(res.data.email);
-                })
-                .catch((err) => console.log(err));
-        }
-    }
-
-    function signOut() {
-        localStorage.removeItem("jwt");
-        setIsLoggedIn(false);
-        setEmailName(null);
-        navigate("/sign-in");
-
-    }
+    const [isReg, setIsReg] = useState(false);
 
     function handleEditAvatarClick() {
         setEditAvatarPopupOpen(true);
@@ -146,11 +58,95 @@ function App() {
         setInfoTooltip(false)
     }
 
+    function handleTokenCheck() {
+        const jwt = localStorage.getItem('jwt');
+        if (jwt) {
+            auth
+                .getToken(jwt)
+                .then((res) => {
+                    handleLogin();
+                    navigate('/');
+                    setEmailName(res.email);
+                })
+                .catch((err) => console.log(err));
+        }
+    }
+
+    useEffect(() => {
+        handleTokenCheck();
+        if (isLoggedIn) {
+            const token = localStorage.getItem('jwt');
+            Promise.all([api.getProfile(token), api.getInitialCards(token)])
+                .then(([userData, cardData]) => {
+                    handleTokenCheck();
+                    setCurrentUser(userData)
+                    setCards(cardData)
+                })
+                .catch((err) => console.log(`Ошибка ${err}`));
+        }
+
+    }, [isLoggedIn]);
+
+
+    useEffect(() => {
+        const token = localStorage.getItem('jwt');
+        api
+            .getInitialCards(token)
+            .then((cards) => setCards(cards))
+            .catch((err) => console.log(err));
+    }, []);
+
+    /* Вход */
+    function onLogin(email, password) {
+        auth
+            .loginUser(email, password)
+            .then((res) => {
+                localStorage.setItem("jwt", res.token);
+                handleLogin();
+                setEmailName(email);
+                navigate('/');
+
+            })
+            .catch(() => {
+                setIsReg(false)
+                setPopupImage(reject);
+                setPopupTitle('Что-то пошло не так! Попробуйте ещё раз');
+                handleInfoTooltip();
+            })
+    }
+
+
+    function onRegister(email, password) {
+        auth.registerUser(email, password)
+            .then((res) => {
+                if (res) {
+                    setIsReg(true);
+                    setPopupImage(resolve);
+                    setPopupTitle('Вы успешно зарегистрировались');
+                    navigate('/sign-in');
+                }
+            })
+            .catch(() => {
+                setIsReg(false);
+                setPopupImage(reject);
+                setPopupTitle("Что-то пошло не так! Попробуйте ещё раз");
+            })
+            .finally(handleInfoTooltip(true));
+    }
+
+
+
+    function signOut() {
+        localStorage.removeItem("jwt");
+        setIsLoggedIn(false);
+        setEmailName(null);
+        navigate("/sign-in");
+    }
+
+
     function handleUpdateUser(data) {
         const token = localStorage.getItem('jwt');
-
         api.editProfile(data, token).then((newUser) => {
-
             setCurrentUser(newUser);
             closeAllPopups();
         })
@@ -174,29 +170,37 @@ function App() {
     function handleInfoTooltip() {
         setInfoTooltip(true);
     }
+    function handleLogin() {
+        setIsLoggedIn(true);
+    }
+
 
     function handleCardLike(card) {
-        const isLiked = card.likes.some(i => i._id === currentUser._id);
-        api.changeStatusLike(card._id, isLiked)
+        // Снова проверяем, есть ли уже лайк на этой карточке
+        const isLiked = card.likes.some((i) => i === currentUser._id);
+        const token = localStorage.getItem('jwt');
+
+        // Отправляем запрос в API и получаем обновлённые данные карточки
+        const changeLikeCardStatus = !isLiked
+            ? api.addLike(card._id, token)
+            : api.deleteLike(card._id, token);
+        changeLikeCardStatus
             .then((newCard) => {
-                // Формируем новый массив на основе имеющегося, подставляя в него новую карточку
-                const newCards = cards.map((c) => c._id === card._id ? newCard : c);
-                // Обновляем стейт
-                setCards(newCards);
+                setCards((item) => item.map((c) => (c._id === card._id ? newCard : c)));
             })
-            .catch(err => {
-                console.log(`Ошибка: ${err}`);
-            });
-
+            .catch((err) => console.log(`Ошибка ${err}`));
     }
 
-    function handleCardDelete(card) {
-        api.removeCard(card).then(() => {
-            setCards((items) => items.filter((c) => c._id !== card._id && c));
-        }).catch((err) => {
-            console.error(err);
-        });
-    }
+    const handleCardDelete = (card) => {
+        const token = localStorage.getItem('jwt');
+        api
+            .removeCard(card._id, token)
+            .then(() => {
+                setCards((cards) => cards.filter((c) => c._id !== card._id));
+                closeAllPopups();
+            })
+            .catch((err) => console.log(`Ошибка ${err}`));
+    };
 
     function handleAddPlaceSubmit(data) {
         const token = localStorage.getItem('jwt');
@@ -228,6 +232,7 @@ function App() {
 
 
     return (
+
         <CurrentUserContext.Provider value={currentUser}>
             <div className="wrapper">
                 <div className="page">
@@ -235,7 +240,7 @@ function App() {
                     <Routes>
                         <Route path="/sign-in" element={
                             <>
-                                <Header title="Регистрация" route="/sign-up"/>
+                                <Header  title="Регистрация" route="/sign-up"/>
                                 <Login onLogin={onLogin}/>
                             </>
                         }/>
@@ -249,7 +254,7 @@ function App() {
 
                         <Route exact path="/" element={
                             <>
-                                <Header title="Выйти" mail={emailName} onClick={signOut} route=""/>
+                                <Header title="Выйти" email={emailName} onClick={signOut} route=""/>
                                 <ProtectedRoute
                                     component={Main}
                                     isLogged={isLoggedIn}
@@ -267,6 +272,7 @@ function App() {
 
                         <Route path="*" element={<Navigate to={isLoggedIn ? "/" : "/sign-in"}/>}/>
                     </Routes>
+
                     <EditaAvatarPopup
                         isOpen={isEditAvatarPopupOpen}
                         onClose={closeAllPopups}

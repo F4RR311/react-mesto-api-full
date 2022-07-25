@@ -6,12 +6,11 @@ const ErrorConflict = require('../errors/ErrorConflict');
 const BadRequestError = require('../errors/BadRequestError');
 const Unauthorized = require('../errors/Unauthorized');
 
-const { NODE_ENV, JWT_SECRET } = process.env;
+
 
 
 module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
-
   User.findOne({ email })
     .select("+password") // в случае аутентификации хеш пароля нужен
     .then((user) => {
@@ -32,7 +31,8 @@ module.exports.login = (req, res, next) => {
     .catch(next);
 };
 
-module.exports.getUser = (req, res, next) => {
+// GET /users — возвращает всех пользователей
+module.exports.getUsers = (req, res, next) => {
   User.find({})
     .then((users) => res.send(users))
     .catch(next);
@@ -51,7 +51,7 @@ module.exports.getUserMe = (req, res, next) => {
     .catch(next);
 };
 
-
+// GET /users/:userId - возвращает пользователя по _id
 module.exports.getUserId = (req, res, next) => {
   const { userId } = req.params;
   User.findById(userId)
@@ -101,6 +101,7 @@ module.exports.createUser = (req, res, next) => {
       }
     });
 };
+// PATCH /users/me — обновляет профиль
 
 module.exports.updateUserInfo = (req, res, next) => {
   const { name, about } = req.body;
@@ -121,6 +122,7 @@ module.exports.updateUserInfo = (req, res, next) => {
     });
 };
 
+// PATCH /users/me/avatar — обновляет аватар
 module.exports.updateAvatar = (req, res, next) => {
   const { avatar } = req.body;
   const userId = req.user._id;

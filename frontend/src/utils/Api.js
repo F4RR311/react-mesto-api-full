@@ -1,6 +1,5 @@
 class Api {
-    constructor({baseUrl, headers}) {
-        this._headers = headers;
+    constructor({baseUrl}) {
         this._baseUrl = baseUrl;
     }
 
@@ -12,12 +11,14 @@ class Api {
         }
     }
 
+
     getProfile(token) {
         return fetch(`${this._baseUrl}/users/me`, {
-            credentials: 'include',
-            Authorization: `Bearer ${token}`,
-        })
-            .then(this._checkResponse)
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+            },
+        }).then(this._checkResponse);
     }
 
     getInitialCards(token) {
@@ -33,7 +34,6 @@ class Api {
     editProfile(data, token) {
         return fetch(`${this._baseUrl}/users/me`, {
             method: "PATCH",
-      //      credentials: 'include',
             headers: {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${token}`,
@@ -66,8 +66,8 @@ class Api {
             .then(this._checkResponse)
     }
 
-    removeCard(data, token) {
-        return fetch(`${this._baseUrl}/cards/${data._id}`, {
+    removeCard(id, token) {
+        return fetch(`${this._baseUrl}/cards/${id}`, {
             method: "DELETE",
             credentials: 'include',
             headers: {
@@ -79,18 +79,26 @@ class Api {
 
     }
 
-    changeStatusLike(id, isLiked, token) {
+    deleteLike(id, token) {
         return fetch(`${this._baseUrl}/cards/${id}/likes`, {
-            method: `${!isLiked ? 'PUT' : 'DELETE'}`,
+            method: "DELETE",
             headers: {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${token}`,
             },
-            credentials: 'include'
-        })
-            .then(this._checkResponse)
-
+        }).then(this._checkResponse)
     }
+
+    addLike(id, token) {
+        return fetch(`${this._baseUrl}/cards/${id}/likes`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+            },
+        }).then(this._checkResponse)
+    }
+
 
     addAvatar(data, token) {
         return fetch(`${this._baseUrl}/users/me/avatar`, {
