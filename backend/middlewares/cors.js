@@ -3,7 +3,6 @@ const allowedCors = [
     'http://domainname.students.nomoredomains.sbs',
     'localhost:3000',
     'http://localhost:3000',
-
 ];
 
 

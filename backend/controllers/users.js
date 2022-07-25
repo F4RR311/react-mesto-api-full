@@ -101,8 +101,8 @@ module.exports.createUser = (req, res, next) => {
       }
     });
 };
-// PATCH /users/me — обновляет профиль
 
+// PATCH /users/me — обновляет профиль
 module.exports.updateUserInfo = (req, res, next) => {
   const { name, about } = req.body;
   const userId = req.user._id;
@@ -125,19 +125,24 @@ module.exports.updateUserInfo = (req, res, next) => {
 // PATCH /users/me/avatar — обновляет аватар
 module.exports.updateAvatar = (req, res, next) => {
   const { avatar } = req.body;
-  const userId = req.user._id;
-  User.findByIdAndUpdate(userId, { avatar }, { new: true, runValidators: true })
+  User.findByIdAndUpdate(
+    req.user._id,
+    { avatar },
+    {
+      new: true,
+      runValidators: true,
+    }
+  )
     .then((user) => {
       if (!user) {
-        throw new ErrorNotFound('Запрашиваемый пользователь не найден');
+        throw new ErrorNotFound("Пользователь по указанному _id не найден");
       }
-      res.send({ data: user });
+      res.send(user);
     })
     .catch((err) => {
-      if (err.name === 'CastError' || err.name === 'ValidationError') {
-        next(new BadRequestError('Переданы некорректные данные'));
-      } else {
-        next(err);
+      if (err.name === "ValidationError") {
+        return next(new BadRequestError("Введены некорректные данные"));
       }
+      return next(err);
     });
 };
